@@ -10,7 +10,7 @@ The Crooked House is a sculpture by Benjamin Fehl, preserving the façade of a h
 
 - **Repository URL**: [https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net)
 - **Organization**: FreeForCharity
-- **Website**: [https://www.thecrookedhouse.net](https://www.thecrookedhouse.net)
+- **Website**: [https://thecrookedhouse.net](https://thecrookedhouse.net)
 
 ## Development
 
