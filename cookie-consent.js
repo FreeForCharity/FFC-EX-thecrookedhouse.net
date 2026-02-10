@@ -6,12 +6,17 @@
 (function() {
   'use strict';
 
-  // Configuration - replace with actual tracking IDs when available
+  // ============================================================================
+  // CONFIGURATION - UPDATE THESE VALUES BEFORE PRODUCTION DEPLOYMENT
+  // ============================================================================
+  // TODO: Replace placeholder values with actual tracking IDs
+  // Without valid IDs, analytics integrations will not function
   const CONFIG = {
-    GA_MEASUREMENT_ID: 'G-XXXXXXXXXX', // Replace with actual Google Analytics ID
-    META_PIXEL_ID: 'XXXXXXXXXXXXXXX', // Replace with actual Meta Pixel ID
-    CLARITY_PROJECT_ID: 'XXXXXXXXXX', // Replace with actual Clarity ID
+    GA_MEASUREMENT_ID: 'G-XXXXXXXXXX',     // TODO: Add Google Analytics Measurement ID
+    META_PIXEL_ID: 'XXXXXXXXXXXXXXX',      // TODO: Add Meta (Facebook) Pixel ID
+    CLARITY_PROJECT_ID: 'XXXXXXXXXX',      // TODO: Add Microsoft Clarity Project ID
   };
+  // ============================================================================
 
   // Cookie preferences object
   let preferences = {
