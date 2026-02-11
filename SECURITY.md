@@ -34,7 +34,7 @@ This website implements:
 - Cookie consent management for user privacy
 - Secure HTTPS connections
 - Regular security scans via CodeQL
-- Content Security Policy headers (via GitHub Pages)
+- Content Security Policy (CSP) headers where supported by the hosting platform
 
 ## Privacy
 

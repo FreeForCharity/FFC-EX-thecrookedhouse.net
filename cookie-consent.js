@@ -18,6 +18,11 @@
   };
   // ============================================================================
 
+  // Helper to check if ID is a valid (non-placeholder) value
+  function isValidTrackingId(id) {
+    return id && !id.includes('X') && id.length > 5;
+  }
+
   // Cookie preferences object
   let preferences = {
     necessary: true,
@@ -29,6 +34,8 @@
   let savedPreferencesBackup = {...preferences};
   let showBanner = false;
   let showPreferences = false;
+  let previousFocusElement = null;
+  let focusTrapHandler = null;
 
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
@@ -54,9 +61,24 @@
         return;
       }
 
-      const savedPreferences = JSON.parse(consent);
-      if (validatePreferences(savedPreferences)) {
-        preferences = {...savedPreferences, functional: true};
+      const savedData = JSON.parse(consent);
+      
+      // Check if consent has expired (12 months = 365 days)
+      if (savedData.savedAt) {
+        const savedDate = new Date(savedData.savedAt);
+        const now = new Date();
+        const daysSinceSaved = (now - savedDate) / (1000 * 60 * 60 * 24);
+        
+        if (daysSinceSaved > 365) {
+          // Consent expired, clear and show banner
+          localStorage.removeItem('cookie-consent');
+          showBanner = true;
+          return;
+        }
+      }
+      
+      if (validatePreferences(savedData)) {
+        preferences = {...savedData, functional: true};
         savedPreferencesBackup = {...preferences};
         applyConsent(preferences);
       } else {
@@ -104,10 +126,10 @@
         </div>
       </div>
 
-      <div id="cookie-preferences" class="cookie-preferences-modal" style="display: none;">
+      <div id="cookie-preferences" class="cookie-preferences-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cookie-preferences-title">
         <div class="cookie-modal-overlay"></div>
         <div class="cookie-modal-content">
-          <h2>Cookie Preferences</h2>
+          <h2 id="cookie-preferences-title">Cookie Preferences</h2>
           <p>We use cookies to enhance your browsing experience and analyze our traffic. You can choose which types of cookies you allow.</p>
           
           <div class="cookie-category">
@@ -193,12 +215,34 @@
     // Modal overlay click to close
     document.querySelector('.cookie-modal-overlay').addEventListener('click', handleCancelPreferences);
     
-    // Escape key to close modal
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && showPreferences) {
-        handleCancelPreferences();
+    // Escape key to close modal and focus trap
+    focusTrapHandler = function(e) {
+      if (showPreferences) {
+        if (e.key === 'Escape') {
+          handleCancelPreferences();
+          return;
+        }
+        
+        // Focus trap - keep focus within modal
+        if (e.key === 'Tab') {
+          const modal = document.getElementById('cookie-preferences');
+          const focusableElements = modal.querySelectorAll(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          
+          if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
-    });
+    };
+    document.addEventListener('keydown', focusTrapHandler);
 
     // Update preferences object when toggles change
     document.getElementById('pref-analytics').addEventListener('change', function(e) {
@@ -236,11 +280,21 @@
     savedPreferencesBackup = {...preferences};
     updatePreferencesUI();
     showPreferences = true;
+    
+    // Store currently focused element to restore later
+    previousFocusElement = document.activeElement;
+    
     document.getElementById('cookie-preferences').style.display = 'block';
     
-    // Focus management
+    // Focus first interactive element in modal
     setTimeout(() => {
-      document.getElementById('pref-analytics').focus();
+      const modal = document.getElementById('cookie-preferences');
+      const focusableElements = modal.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+      }
     }, 100);
   }
 
@@ -262,7 +316,11 @@
 
   function saveAndApply() {
     try {
-      localStorage.setItem('cookie-consent', JSON.stringify(preferences));
+      const dataToSave = {
+        ...preferences,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem('cookie-consent', JSON.stringify(dataToSave));
     } catch (e) {
       console.warn('Unable to save preferences to localStorage:', e);
     }
@@ -278,6 +336,12 @@
   function hidePreferences() {
     document.getElementById('cookie-preferences').style.display = 'none';
     showPreferences = false;
+    
+    // Restore focus to previously focused element
+    if (previousFocusElement) {
+      previousFocusElement.focus();
+      previousFocusElement = null;
+    }
   }
 
   function openPreferences() {
@@ -320,24 +384,39 @@
 
   function deleteAnalyticsCookies() {
     const cookiesToDelete = ['_ga', '_gid', '_fbp', 'fr', '_clck', '_clsk'];
+    const hostname = window.location.hostname;
+    const dotHostname = '.' + hostname;
     
     cookiesToDelete.forEach(function(name) {
+      // Delete cookie without explicit domain
       document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname + ';';
+      // Delete cookie scoped to the current hostname
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + hostname + ';';
+      // Delete cookie scoped to the parent ".hostname" variant
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + dotHostname + ';';
     });
 
     // Delete dynamic _ga_* cookies
     document.cookie.split(';').forEach(function(cookie) {
       const cookieName = cookie.split('=')[0].trim();
       if (cookieName.startsWith('_ga_')) {
+        // Delete cookie without explicit domain
         document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname + ';';
+        // Delete cookie scoped to the current hostname
+        document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + hostname + ';';
+        // Delete cookie scoped to the parent ".hostname" variant
+        document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + dotHostname + ';';
       }
     });
   }
 
   function loadGoogleAnalytics() {
     if (document.querySelector('script[src*="googletagmanager.com/gtag"]')) return;
+    
+    if (!isValidTrackingId(CONFIG.GA_MEASUREMENT_ID)) {
+      console.warn('[Cookie Consent] Google Analytics ID is not configured. Skipping GA script loading.');
+      return;
+    }
     
     const gaScript = document.createElement('script');
     gaScript.async = true;
@@ -360,6 +439,11 @@
 
   function loadMetaPixel() {
     if (document.querySelector('script[src*="fbevents.js"]')) return;
+    
+    if (!isValidTrackingId(CONFIG.META_PIXEL_ID)) {
+      console.warn('[Cookie Consent] Meta Pixel ID is not configured. Skipping Meta Pixel script loading.');
+      return;
+    }
     
     const fbScript = document.createElement('script');
     fbScript.textContent = `
@@ -388,6 +472,11 @@
 
   function loadMicrosoftClarity() {
     if (document.querySelector('script[src*="clarity.ms"]')) return;
+    
+    if (!isValidTrackingId(CONFIG.CLARITY_PROJECT_ID)) {
+      console.warn('[Cookie Consent] Microsoft Clarity ID is not configured. Skipping Clarity script loading.');
+      return;
+    }
     
     const clarityScript = document.createElement('script');
     clarityScript.textContent = `
