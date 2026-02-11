@@ -102,6 +102,13 @@
   function createBannerHTML() {
     const container = document.createElement('div');
     container.id = 'cookie-consent-container';
+    
+    // Determine the correct path to cookie-policy.html based on current page location
+    const currentPath = window.location.pathname;
+    const cookiePolicyPath = currentPath.includes('/') && !currentPath.endsWith('/') && currentPath !== '/index.html'
+      ? '../cookie-policy.html'
+      : 'cookie-policy.html';
+    
     container.innerHTML = `
       <div id="cookie-banner" class="cookie-banner" style="display: none;">
         <div class="cookie-banner-content">
@@ -114,8 +121,7 @@
               decline non-essential cookies.
             </p>
             <div class="cookie-banner-links">
-              <a href="/privacy-policy.html">Privacy Policy</a>
-              <a href="/cookie-policy.html">Cookie Policy</a>
+              <a href="${cookiePolicyPath}">Cookie Policy</a>
             </div>
           </div>
           <div class="cookie-banner-buttons">
