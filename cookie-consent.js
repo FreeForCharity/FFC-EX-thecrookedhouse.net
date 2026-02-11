@@ -20,7 +20,28 @@
 
   // Helper to check if ID is a valid (non-placeholder) value
   function isValidTrackingId(id) {
-    return id && !id.includes('X') && id.length > 5;
+    if (!id || id.length <= 5) {
+      return false;
+    }
+
+    // Known placeholder values used in CONFIG
+    const placeholderIds = [
+      'G-XXXXXXXXXX',
+      'XXXXXXXXXXXXXXX',
+      'XXXXXXXXXX'
+    ];
+
+    if (placeholderIds.includes(id)) {
+      return false;
+    }
+
+    // Treat values that are all/mostly 'X' (optionally after 'G-' prefix) as placeholders
+    const normalized = id.startsWith('G-') ? id.slice(2) : id;
+    if (/^X+$/i.test(normalized)) {
+      return false;
+    }
+
+    return true;
   }
 
   // Cookie preferences object
