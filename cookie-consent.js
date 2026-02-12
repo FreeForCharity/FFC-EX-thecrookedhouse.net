@@ -126,15 +126,17 @@
     
     // Determine the correct path to cookie-policy.html based on current page location
     const currentPath = window.location.pathname;
-    const cookiePolicyPath = currentPath.includes('/') && !currentPath.endsWith('/') && currentPath !== '/index.html'
+    // Check if we're in a subdirectory (path has more than 2 segments: / + directory + file)
+    const isInSubdirectory = currentPath.split('/').length > 2;
+    const cookiePolicyPath = isInSubdirectory
       ? '../cookie-policy.html'
       : 'cookie-policy.html';
     
     container.innerHTML = `
-      <div id="cookie-banner" class="cookie-banner" style="display: none;">
+      <div id="cookie-banner" class="cookie-banner" style="display: none;" role="region" aria-labelledby="cookie-banner-title">
         <div class="cookie-banner-content">
           <div class="cookie-banner-text">
-            <h3>We Value Your Privacy</h3>
+            <h3 id="cookie-banner-title">We Value Your Privacy</h3>
             <p>
               We use cookies to improve your experience on our site, analyze traffic, and enable
               certain features. By clicking "Accept All", you consent to our use of
@@ -447,7 +449,7 @@
     
     const gaScript = document.createElement('script');
     gaScript.async = true;
-    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + CONFIG.GA_MEASUREMENT_ID;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(CONFIG.GA_MEASUREMENT_ID);
     document.head.appendChild(gaScript);
 
     const gaConfigScript = document.createElement('script');
@@ -492,7 +494,7 @@
     img.height = 1;
     img.width = 1;
     img.style.display = 'none';
-    img.src = 'https://www.facebook.com/tr?id=' + CONFIG.META_PIXEL_ID + '&ev=PageView&noscript=1';
+    img.src = 'https://www.facebook.com/tr?id=' + encodeURIComponent(CONFIG.META_PIXEL_ID) + '&ev=PageView&noscript=1';
     fbNoScript.appendChild(img);
     document.body.appendChild(fbNoScript);
   }
