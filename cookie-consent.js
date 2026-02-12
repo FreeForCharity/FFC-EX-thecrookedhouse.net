@@ -192,7 +192,7 @@
             <div class="cookie-category-header">
               <h3>Analytics Cookies</h3>
               <div class="cookie-toggle">
-                <input type="checkbox" id="pref-analytics" class="cookie-toggle-input">
+                <input type="checkbox" id="pref-analytics" class="cookie-toggle-input" aria-label="Enable Analytics Cookies">
                 <label for="pref-analytics" class="cookie-toggle-label">
                   <span class="cookie-toggle-slider"></span>
                 </label>
@@ -208,7 +208,7 @@
             <div class="cookie-category-header">
               <h3>Marketing Cookies</h3>
               <div class="cookie-toggle">
-                <input type="checkbox" id="pref-marketing" class="cookie-toggle-input">
+                <input type="checkbox" id="pref-marketing" class="cookie-toggle-input" aria-label="Enable Marketing Cookies">
                 <label for="pref-marketing" class="cookie-toggle-label">
                   <span class="cookie-toggle-slider"></span>
                 </label>
@@ -389,6 +389,14 @@
     if (previousPrefs) {
       if ((previousPrefs.analytics && !prefs.analytics) || (previousPrefs.marketing && !prefs.marketing)) {
         deleteAnalyticsCookies();
+        
+        // Disable already-loaded trackers
+        if (previousPrefs.analytics && !prefs.analytics) {
+          disableAnalyticsTrackers();
+        }
+        if (previousPrefs.marketing && !prefs.marketing) {
+          disableMarketingTrackers();
+        }
       }
     }
 
@@ -437,6 +445,42 @@
         document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + dotHostname + ';';
       }
     });
+  }
+
+  function disableAnalyticsTrackers() {
+    // Disable Google Analytics if loaded
+    if (window.gtag && CONFIG.GA_MEASUREMENT_ID) {
+      // Update consent mode to denied
+      window.gtag('consent', 'update', {
+        'analytics_storage': 'denied'
+      });
+      
+      // Set GA disable flag
+      const gaDisableProperty = 'ga-disable-' + CONFIG.GA_MEASUREMENT_ID;
+      window[gaDisableProperty] = true;
+    }
+    
+    // Disable Microsoft Clarity if loaded
+    if (window.clarity) {
+      try {
+        // Clarity doesn't have a direct disable API, but we can stop it from sending data
+        window.clarity('consent', false);
+      } catch (e) {
+        // Clarity API might not support consent method, continue silently
+      }
+    }
+  }
+
+  function disableMarketingTrackers() {
+    // Disable Meta Pixel if loaded
+    if (window.fbq) {
+      try {
+        // Revoke consent for Meta Pixel
+        window.fbq('consent', 'revoke');
+      } catch (e) {
+        // Meta Pixel API might not support consent method in all versions
+      }
+    }
   }
 
   function loadGoogleAnalytics() {
