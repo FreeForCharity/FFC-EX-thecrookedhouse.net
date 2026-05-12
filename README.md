@@ -25,9 +25,47 @@ See `.github/workflows/static.yml` for deployment configuration.
 ## Structure
 
 - `index.html` - Main homepage
+- `cookie-policy.html` - Cookie policy page
+- `cookie-consent.js` - Cookie consent management system
+- `cookie-consent.css` - Cookie consent styling
 - `become-a-friend/` - Information about becoming a Friend of The Crooked House
 - `donors/` - Donor information and recognition
 - `press/` - Press and media information
+- `.github/workflows/` - GitHub Actions workflows for deployment and security
+
+## Features
+
+### Cookie Consent Management
+
+The website includes a GDPR-compliant cookie consent system that:
+
+- Allows users to accept, decline, or customize cookie preferences
+- Supports necessary, functional, analytics, and marketing cookies
+- Provides conditional loading of third-party scripts based on user consent
+- Stores preferences in localStorage for 12 months
+- Includes a detailed cookie policy page
+
+**Third-party services** (loaded only with user consent):
+- Google Analytics (analytics)
+- Microsoft Clarity (analytics)
+- Meta Pixel (marketing)
+
+### Security
+
+- CodeQL security scanning
+- Static site deployment via GitHub Pages
+- See [SECURITY.md](SECURITY.md) for security policies
+
+## Privacy
+
+For information about cookies and privacy, see:
+- [Cookie Policy](https://thecrookedhouse.net/cookie-policy.html)
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting changes.
+
+See also [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community guidelines.
 
 ## License
 
