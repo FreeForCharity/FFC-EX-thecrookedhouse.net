@@ -290,17 +290,41 @@
 /* Responsive adjustments for small screens */
 @media (max-width: 480px) {
   .cookie-banner-content {
-    padding: 1rem;
+    padding: 0.625rem 0.875rem;
+    gap: 0.5rem;
   }
-  
+
   .cookie-banner h3 {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
   }
-  
+
   .cookie-banner p {
-    font-size: 0.8125rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    margin-bottom: 0.4rem;
   }
-  
+
+  .cookie-banner-links {
+    font-size: 0.7rem;
+    margin-bottom: 0;
+  }
+
+  /* Three buttons share one row instead of stacking */
+  .cookie-banner-buttons {
+    flex-direction: row;
+    gap: 0.4rem;
+  }
+
+  .cookie-banner-buttons .cookie-btn {
+    flex: 1 1 0;
+    padding: 0.55rem 0.4rem;
+    font-size: 0.78rem;
+    min-height: 40px;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
   .cookie-modal-content {
     padding: 1rem;
   }
