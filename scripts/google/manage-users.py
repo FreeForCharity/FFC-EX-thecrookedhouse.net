@@ -24,12 +24,12 @@ from __future__ import annotations
 import argparse
 import sys
 
-from google.analytics.admin_v1beta.types import (
+from google.analytics.admin_v1alpha.types import (
     AccessBinding,
     CreateAccessBindingRequest,
     UpdateAccessBindingRequest,
 )
-from google.analytics.admin import AnalyticsAdminServiceClient
+from google.analytics.admin_v1alpha import AnalyticsAdminServiceClient
 from googleapiclient.discovery import build
 
 from config import ACCOUNT_NAME, GA4_MEASUREMENT_ID, GA4_PROPERTY_ID, credentials
@@ -117,8 +117,8 @@ def gtm_reconcile(svc, dry_run: bool, prune: bool) -> None:
 
 GA4_ROLE_MAP = {
     "admin": "predefinedRoles/admin",
-    "editor": "predefinedRoles/edit",
-    "viewer": "predefinedRoles/read",
+    "editor": "predefinedRoles/editor",
+    "viewer": "predefinedRoles/viewer",
 }
 
 

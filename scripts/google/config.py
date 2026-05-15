@@ -42,20 +42,33 @@ SCOPES = [
 
 
 def credentials():
-    """Resolve Application Default Credentials and scope them.
+    """Resolve credentials, preferring the FFC OAuth refresh token if present.
 
-    Order of resolution (handled by google.auth.default):
-      1. GOOGLE_APPLICATION_CREDENTIALS env var (file path, optional)
-      2. WIF / external account credentials set up by gcloud or
+    Order of resolution:
+      1. ~/.config/ffc-google/token.json — refresh token from bootstrap-sa-access.py
+         (broader scopes than gcloud default; needed for user-management APIs)
+      2. GOOGLE_APPLICATION_CREDENTIALS env var (file path, optional)
+      3. WIF / external account credentials set up by gcloud or
          google-github-actions/auth@v2
-      3. gcloud user credentials (from `gcloud auth application-default login`)
-      4. GCE / Cloud Run metadata server
+      4. gcloud user credentials (from `gcloud auth application-default login`)
+      5. GCE / Cloud Run metadata server
     """
+    from pathlib import Path
+
+    ffc_token = Path.home() / ".config" / "ffc-google" / "token.json"
+    if ffc_token.exists():
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+
+        creds = Credentials.from_authorized_user_file(str(ffc_token), SCOPES)
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        return creds
+
     import google.auth
 
     creds, project = google.auth.default(scopes=SCOPES)
     if project and project != GCP_PROJECT_ID:
-        # Don't fail — just note the mismatch for debugging.
         import sys
         print(f"note: ADC project ({project}) differs from configured "
               f"GCP_PROJECT_ID ({GCP_PROJECT_ID})", file=sys.stderr)
