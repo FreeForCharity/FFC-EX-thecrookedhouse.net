@@ -55,6 +55,15 @@ In execution order:
 8. [#77](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/77) — Google Cloud Project, service account, API access
 9. [#66](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/66) — Google Ad Grants ($10K/month in free search ads)
 
+### 🟪 Google services expansion (backlog)
+
+Things that build on the Workspace + GTM + GA4 foundation, in rough value order:
+
+1. [#82](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/82) — Looker Studio dashboard (free) fed by GA4 + Search Console
+2. [#83](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/83) — Google Business Profile + Maps embed (local search visibility)
+3. [#85](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/85) — Workspace API automation (domain-wide delegation; needed for Gmail/Drive/Calendar scripts)
+4. [#84](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/84) — Cloud Storage + scheduled Cloud Functions (daily backups, monthly donor reports)
+
 ### 🟧 Zeffy fundraising integration → [Tracker #75](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/75)
 
 1. [#70](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/issues/70) — Sign up + verify 501(c)(3)

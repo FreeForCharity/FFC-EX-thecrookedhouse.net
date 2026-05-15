@@ -8,7 +8,10 @@ Scripts that manage The Crooked House's Google Tag Manager + Google Analytics 4 
 |---|---|
 | `bootstrap-gtm.py` | Configures the GTM container (`GTM-5JV8JHCH`): consent-mode v2 defaults, the GA4 Configuration tag, the GTM trigger for "All Pages", outbound-click conversion tracking (`donate_click`, `email_click`), and publishes a new container version. |
 | `bootstrap-ga4.py` | Configures the GA4 property: 14-month data retention, Web data stream, Enhanced Measurement settings, conversion events that match what GTM fires, custom dimensions for donor segmentation. |
+| `manage-users.py` | Reconciles GTM + GA4 user access against the declarative roster in `users.py`. Idempotent: invites missing users, updates roles that drifted, optionally prunes users not in the roster (`--prune`). |
 | `wire-site.py` | Patches the four content pages + `cookie-policy.html` + `404.html` to load the GTM container snippet and removes the legacy direct-gtag loading from `cookie-consent.js`. |
+
+To add or remove team members, edit `users.py` (one Python dict per person) and re-run `manage-users.py`. No code changes required.
 
 ## What's NOT automated (one-time, requires a human)
 

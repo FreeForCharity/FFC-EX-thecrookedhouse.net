@@ -10,6 +10,7 @@ on:
         options:
           - bootstrap-gtm
           - bootstrap-ga4
+          - manage-users
           - wire-site
           - all
       dry_run:
@@ -91,6 +92,11 @@ jobs:
         if: ${{ inputs.script == 'bootstrap-ga4' || inputs.script == 'all' }}
         working-directory: scripts/google
         run: python bootstrap-ga4.py ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Run manage-users.py
+        if: ${{ inputs.script == 'manage-users' || inputs.script == 'all' }}
+        working-directory: scripts/google
+        run: python manage-users.py ${{ inputs.dry_run && '--dry-run' || '' }}
 
       - name: Run wire-site.py
         if: ${{ inputs.script == 'wire-site' || inputs.script == 'all' }}
