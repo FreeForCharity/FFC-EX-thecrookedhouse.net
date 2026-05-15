@@ -45,15 +45,18 @@ Granted in the respective product UIs (not GCP):
 - **GTM**: in Tag Manager → Admin → User Management on the account → Add user → service account email → role: Admin
 - **GA4**: in Analytics → Admin → Property access management → Add user → service account email → role: Editor (or Administrator if needed)
 
-### 4. GitHub Actions secrets
-Required secrets on the repository (Settings → Secrets and variables → Actions):
+### 4. GitHub Actions environment
 
-| Secret | Value |
-|---|---|
-| `GOOGLE_SA_KEY` | The full contents of the service account JSON key file |
-| `GTM_CONTAINER_ID` | `GTM-5JV8JHCH` |
-| `GA4_PROPERTY_ID` | The numeric property ID, e.g. `123456789` (find in Analytics → Admin → Property settings) |
-| `GA4_MEASUREMENT_ID` | The `G-XXXXXXXXXX` ID from the Web data stream |
+The scripts run in the **`google-prod`** GitHub environment (Settings → Environments → google-prod). IDs are public — they ship in the page HTML — so they live as **variables** (visible in logs); only the SA key is a **secret**.
+
+| Type | Name | Value |
+|---|---|---|
+| variable | `GCP_PROJECT_ID` | `charming-hour-496417-p9` |
+| variable | `GTM_CONTAINER_ID` | `GTM-5JV8JHCH` |
+| variable | `GA4_MEASUREMENT_ID` | `G-EDCGRNN40D` |
+| variable | `GA4_STREAM_ID` | `14886848587` |
+| **secret** | `GOOGLE_SA_KEY` | full contents of the service-account JSON key file |
+| secret (optional) | `GA4_PROPERTY_ID` | numeric, e.g. `123456789` — auto-discovered if unset |
 
 ## How to run
 

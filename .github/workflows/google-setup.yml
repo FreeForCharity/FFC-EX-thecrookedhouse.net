@@ -18,15 +18,21 @@ on:
         default: true
         type: boolean
 
-# This workflow is manual-trigger only. It uses the FFC service-account JSON
-# stored as the GOOGLE_SA_KEY secret to call the Google APIs idempotently.
+# Manual-trigger workflow that runs the API automation against the
+# `google-prod` environment.
 #
-# Required secrets (Settings → Secrets and variables → Actions):
-#   GOOGLE_SA_KEY        Full contents of the service-account JSON key
-#   GTM_CONTAINER_ID     e.g. GTM-5JV8JHCH
-#   GA4_MEASUREMENT_ID   e.g. G-EDCGRNN40D
-#   GA4_STREAM_ID        e.g. 14886848587
-#   GA4_PROPERTY_ID      numeric, optional (discovered at runtime if unset)
+# The google-prod environment owns:
+#   VARIABLES (public, visible in logs):
+#     GTM_CONTAINER_ID     e.g. GTM-5JV8JHCH
+#     GA4_MEASUREMENT_ID   e.g. G-EDCGRNN40D
+#     GA4_STREAM_ID        e.g. 14886848587
+#     GCP_PROJECT_ID       e.g. charming-hour-496417-p9
+#   SECRETS (private, masked in logs):
+#     GOOGLE_SA_KEY        Full contents of the service-account JSON key
+#     GA4_PROPERTY_ID      Optional; auto-discovered if absent
+#
+# IDs are public information — they ship in the page HTML — so they belong
+# as variables, not secrets. The SA key is the only true secret.
 
 permissions:
   contents: write   # wire-site commits patched HTML
@@ -35,12 +41,14 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
+    environment: google-prod
     env:
       GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
-      GTM_CONTAINER_ID: ${{ secrets.GTM_CONTAINER_ID }}
-      GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID }}
-      GA4_STREAM_ID: ${{ secrets.GA4_STREAM_ID }}
+      GTM_CONTAINER_ID: ${{ vars.GTM_CONTAINER_ID }}
+      GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
+      GA4_STREAM_ID: ${{ vars.GA4_STREAM_ID }}
       GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,6 +60,14 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r scripts/google/requirements.txt
+
+      - name: Show config (IDs only — SA key remains masked)
+        run: |
+          echo "GCP_PROJECT_ID:     $GCP_PROJECT_ID"
+          echo "GTM_CONTAINER_ID:   $GTM_CONTAINER_ID"
+          echo "GA4_MEASUREMENT_ID: $GA4_MEASUREMENT_ID"
+          echo "GA4_STREAM_ID:      $GA4_STREAM_ID"
+          echo "GA4_PROPERTY_ID:    ${GA4_PROPERTY_ID:-<unset; will auto-discover>}"
 
       - name: Run bootstrap-gtm.py
         if: ${{ inputs.script == 'bootstrap-gtm' || inputs.script == 'all' }}
@@ -77,7 +93,7 @@ jobs:
           title: 'Wire GTM container snippet into pages'
           commit-message: 'Wire GTM container snippet into pages'
           body: |
-            Automated: ran `scripts/google/wire-site.py` and patched HTML to load the GTM container `${{ env.GTM_CONTAINER_ID }}` plus the consent-mode v2 default state.
+            Automated: ran `scripts/google/wire-site.py` and patched HTML to load the GTM container `${{ vars.GTM_CONTAINER_ID }}` plus the consent-mode v2 default state.
 
             Trigger: workflow_dispatch on ${{ github.workflow }}.
           labels: integration,google-workspace
