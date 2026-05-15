@@ -563,3 +563,19 @@
   }
 
 })();
+
+// GTM consent-mode v2 wired
+// Called by the cookie banner whenever the user updates their preferences.
+function pushConsentUpdate(consent) {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'update', {
+    'ad_storage': consent.marketing ? 'granted' : 'denied',
+    'ad_user_data': consent.marketing ? 'granted' : 'denied',
+    'ad_personalization': consent.marketing ? 'granted' : 'denied',
+    'analytics_storage': consent.analytics ? 'granted' : 'denied',
+    'functionality_storage': consent.functional ? 'granted' : 'denied',
+    'security_storage': 'granted'
+  });
+}
+
