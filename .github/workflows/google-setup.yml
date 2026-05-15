@@ -64,6 +64,15 @@ jobs:
           workload_identity_provider: ${{ vars.WIF_PROVIDER }}
           service_account: ${{ vars.GOOGLE_SA_EMAIL }}
           project_id: ${{ vars.GCP_PROJECT_ID }}
+          token_format: access_token
+          access_token_scopes: |-
+            https://www.googleapis.com/auth/tagmanager.edit.containers
+            https://www.googleapis.com/auth/tagmanager.publish
+            https://www.googleapis.com/auth/tagmanager.manage.users
+            https://www.googleapis.com/auth/analytics.edit
+            https://www.googleapis.com/auth/analytics.manage.users
+            https://www.googleapis.com/auth/analytics.readonly
+            https://www.googleapis.com/auth/cloud-platform
 
       - uses: actions/setup-python@v5
         with:
