@@ -32,22 +32,62 @@ See [issue #77](https://github.com/FreeForCharity/FFC-EX-thecrookedhouse.net/iss
 - Google Analytics Data API
 
 ### 2. Service account
-Created in GCP console under `thecrookedhouse` project:
+Created in GCP console under the `charming-hour-496417-p9` project:
 
-- Name: `ffc-automation`
-- Email: `ffc-automation@thecrookedhouse.iam.gserviceaccount.com` (example)
-- Roles: none at project level
-- Key: JSON, downloaded once
+- Name: `githubactions-thecrookedhouse`
+- Email: `githubactions-thecrookedhouse@charming-hour-496417-p9.iam.gserviceaccount.com`
+- Roles at project level: none (we grant per-product in the UIs)
+- **No JSON key needed** — we use Workload Identity Federation instead.
 
-### 3. Service account permissions
-Granted in the respective product UIs (not GCP):
+### 3. Workload Identity Federation (auth without JSON keys)
 
-- **GTM**: in Tag Manager → Admin → User Management on the account → Add user → service account email → role: Admin
-- **GA4**: in Analytics → Admin → Property access management → Add user → service account email → role: Editor (or Administrator if needed)
+WIF lets GitHub Actions impersonate the service account with a short-lived OIDC token instead of a long-lived JSON key — Google's recommended pattern.
 
-### 4. GitHub Actions environment
+One-time setup in GCP:
 
-The scripts run in the **`google-prod`** GitHub environment (Settings → Environments → google-prod). IDs are public — they ship in the page HTML — so they live as **variables** (visible in logs); only the SA key is a **secret**.
+```bash
+# 1. Create the workload identity pool (free)
+gcloud iam workload-identity-pools create github-actions \
+  --project=charming-hour-496417-p9 \
+  --location=global \
+  --display-name="GitHub Actions"
+
+# 2. Create the GitHub OIDC provider in that pool
+gcloud iam workload-identity-pools providers create-oidc github-provider \
+  --project=charming-hour-496417-p9 \
+  --location=global \
+  --workload-identity-pool=github-actions \
+  --display-name="GitHub Actions Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+  --attribute-condition="assertion.repository_owner == 'FreeForCharity'" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# 3. Allow the GitHub repo to impersonate the service account
+gcloud iam service-accounts add-iam-policy-binding \
+  githubactions-thecrookedhouse@charming-hour-496417-p9.iam.gserviceaccount.com \
+  --project=charming-hour-496417-p9 \
+  --role=roles/iam.workloadIdentityUser \
+  --member="principalSet://iam.googleapis.com/projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/github-actions/attribute.repository/FreeForCharity/FFC-EX-thecrookedhouse.net"
+```
+
+Get the project number for the last command:
+```bash
+gcloud projects describe charming-hour-496417-p9 --format='value(projectNumber)'
+```
+
+The full WIF provider path you'll need for the `WIF_PROVIDER` env variable:
+```
+projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/github-actions/providers/github-provider
+```
+
+### 4. Service account permissions (granted in product UIs, not GCP)
+
+- **GTM**: Tag Manager → Admin → User Management on the account → Add user → `githubactions-thecrookedhouse@charming-hour-496417-p9.iam.gserviceaccount.com` → role: **Admin**
+- **GA4**: Analytics → Admin → Property access management → Add user → same email → role: **Editor** (or Administrator)
+
+### 5. GitHub Actions environment
+
+The scripts run in the **`google-prod`** GitHub environment (Settings → Environments → google-prod). IDs are public — they ship in the page HTML — so they live as **variables** (visible in logs).
 
 | Type | Name | Value |
 |---|---|---|
@@ -55,8 +95,12 @@ The scripts run in the **`google-prod`** GitHub environment (Settings → Enviro
 | variable | `GTM_CONTAINER_ID` | `GTM-5JV8JHCH` |
 | variable | `GA4_MEASUREMENT_ID` | `G-EDCGRNN40D` |
 | variable | `GA4_STREAM_ID` | `14886848587` |
-| **secret** | `GOOGLE_SA_KEY` | full contents of the service-account JSON key file |
-| secret (optional) | `GA4_PROPERTY_ID` | numeric, e.g. `123456789` — auto-discovered if unset |
+| variable | `GOOGLE_SA_NAME` | `githubactions-thecrookedhouse` |
+| variable | `GOOGLE_SA_EMAIL` | `githubactions-thecrookedhouse@charming-hour-496417-p9.iam.gserviceaccount.com` |
+| variable | `WIF_PROVIDER` | full path from step 3 |
+| secret (optional) | `GA4_PROPERTY_ID` | numeric — auto-discovered if unset |
+
+**No `GOOGLE_SA_KEY` needed.** That's the whole point of WIF.
 
 ## How to run
 
@@ -68,11 +112,10 @@ python -m venv .venv
 source .venv/bin/activate   # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 
-# Set env from a local .env file (not committed)
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/ffc-automation-key.json
-export GTM_CONTAINER_ID=GTM-5JV8JHCH
-export GA4_PROPERTY_ID=123456789
-export GA4_MEASUREMENT_ID=G-XXXXXXXXXX
+# Authenticate as your Google user via ADC (one-time per machine)
+gcloud auth application-default login
+
+# IDs default to baked-in values in config.py; override only if needed.
 
 python bootstrap-gtm.py --dry-run    # preview changes
 python bootstrap-gtm.py              # apply
