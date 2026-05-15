@@ -121,6 +121,13 @@ jobs:
           branch: chore/wire-gtm-snippet
           title: 'Wire GTM container snippet into pages'
           commit-message: 'Wire GTM container snippet into pages'
+          # IMPORTANT: explicit allowlist so we never commit ephemeral
+          # auth artifacts like gha-creds-*.json (which caused the
+          # 2026-05-15 secret-scanning incident — see SECURITY.md).
+          add-paths: |
+            *.html
+            **/*.html
+            cookie-consent.js
           body: |
             Automated: ran `scripts/google/wire-site.py` and patched HTML to load the GTM container `${{ vars.GTM_CONTAINER_ID }}` plus the consent-mode v2 default state.
 
