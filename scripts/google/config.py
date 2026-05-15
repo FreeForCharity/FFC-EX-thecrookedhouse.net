@@ -33,6 +33,7 @@ GA4_PROPERTY_ID = os.environ.get("GA4_PROPERTY_ID")
 
 SCOPES = [
     "https://www.googleapis.com/auth/tagmanager.edit.containers",
+    "https://www.googleapis.com/auth/tagmanager.edit.containerversions",
     "https://www.googleapis.com/auth/tagmanager.publish",
     "https://www.googleapis.com/auth/tagmanager.manage.users",
     "https://www.googleapis.com/auth/analytics.edit",
