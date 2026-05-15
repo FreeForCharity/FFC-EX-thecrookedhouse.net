@@ -21,20 +21,25 @@ on:
 # Manual-trigger workflow that runs the API automation against the
 # `google-prod` environment.
 #
-# The google-prod environment owns:
-#   VARIABLES (public, visible in logs):
-#     GTM_CONTAINER_ID     e.g. GTM-5JV8JHCH
-#     GA4_MEASUREMENT_ID   e.g. G-EDCGRNN40D
-#     GA4_STREAM_ID        e.g. 14886848587
-#     GCP_PROJECT_ID       e.g. charming-hour-496417-p9
-#   SECRETS (private, masked in logs):
-#     GOOGLE_SA_KEY        Full contents of the service-account JSON key
-#     GA4_PROPERTY_ID      Optional; auto-discovered if absent
+# AUTH: Workload Identity Federation (no JSON keys). GitHub mints a short-lived
+# OIDC token for the run; google-github-actions/auth@v2 exchanges it for a
+# Google access token bound to the `githubactions-thecrookedhouse` service
+# account. Token expires when the job ends — nothing to rotate, nothing to leak.
 #
-# IDs are public information — they ship in the page HTML — so they belong
-# as variables, not secrets. The SA key is the only true secret.
+# The google-prod environment owns:
+#   variables (visible in logs):
+#     GTM_CONTAINER_ID, GA4_MEASUREMENT_ID, GA4_STREAM_ID, GCP_PROJECT_ID,
+#     GOOGLE_SA_EMAIL, GOOGLE_SA_NAME, WIF_PROVIDER
+#   secrets (masked):
+#     GA4_PROPERTY_ID  — optional; auto-discovered if absent.
+#                        Marked secret only because some teams treat
+#                        property IDs as semi-private; safe to make a var.
+#
+# WIF_PROVIDER must be the full resource path:
+#   projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/<POOL>/providers/<PROVIDER>
 
 permissions:
+  id-token: write   # WIF: GitHub mints the OIDC token
   contents: write   # wire-site commits patched HTML
   pull-requests: write
 
@@ -43,14 +48,21 @@ jobs:
     runs-on: ubuntu-latest
     environment: google-prod
     env:
-      GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       GTM_CONTAINER_ID: ${{ vars.GTM_CONTAINER_ID }}
       GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
       GA4_STREAM_ID: ${{ vars.GA4_STREAM_ID }}
       GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
-      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GOOGLE_SA_EMAIL }}
+          project_id: ${{ vars.GCP_PROJECT_ID }}
 
       - uses: actions/setup-python@v5
         with:
@@ -61,13 +73,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/google/requirements.txt
 
-      - name: Show config (IDs only — SA key remains masked)
+      - name: Show config (IDs only — auth is via WIF, no keys to print)
         run: |
           echo "GCP_PROJECT_ID:     $GCP_PROJECT_ID"
           echo "GTM_CONTAINER_ID:   $GTM_CONTAINER_ID"
           echo "GA4_MEASUREMENT_ID: $GA4_MEASUREMENT_ID"
           echo "GA4_STREAM_ID:      $GA4_STREAM_ID"
           echo "GA4_PROPERTY_ID:    ${GA4_PROPERTY_ID:-<unset; will auto-discover>}"
+          echo "Acting-as SA:       ${{ vars.GOOGLE_SA_EMAIL }}"
 
       - name: Run bootstrap-gtm.py
         if: ${{ inputs.script == 'bootstrap-gtm' || inputs.script == 'all' }}
