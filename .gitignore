@@ -21,3 +21,27 @@ npm-debug.log*
 # Dependencies (if needed in future)
 node_modules/
 vendor/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# Google WIF / SA credentials (ephemeral, written by google-github-actions/auth)
+gha-creds-*.json
+
+# Local FFC OAuth token cache (per-user, not for sharing)
+.config/ffc-google/
+
+# Playwright + audit screenshots produced during local runs
+.playwright-mcp/
+audit-*.png
+baseline-*.png
+fix*.png
+final-*.png
+live-*.png
+local-*.png
+postdeploy-*.png
+review-*.png
