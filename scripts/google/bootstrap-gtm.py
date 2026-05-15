@@ -195,7 +195,7 @@ def main():
         "name": "GA4 Event — donate_click",
         "type": "gaawe",
         "parameter": [
-            {"type": "template", "key": "measurementId", "value": GA4_MEASUREMENT_ID},
+            {"type": "template", "key": "measurementIdOverride", "value": GA4_MEASUREMENT_ID},
             {"type": "template", "key": "eventName", "value": "donate_click"},
         ],
         "firingTriggerId": [donate_click_trigger_id] if donate_click_trigger_id else [],
@@ -212,7 +212,7 @@ def main():
         "name": "GA4 Event — email_click",
         "type": "gaawe",
         "parameter": [
-            {"type": "template", "key": "measurementId", "value": GA4_MEASUREMENT_ID},
+            {"type": "template", "key": "measurementIdOverride", "value": GA4_MEASUREMENT_ID},
             {"type": "template", "key": "eventName", "value": "email_click"},
         ],
         "firingTriggerId": [email_click_trigger_id] if email_click_trigger_id else [],
