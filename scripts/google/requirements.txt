@@ -1,4 +1,5 @@
 google-api-python-client>=2.130.0
 google-auth>=2.30.0
+google-auth-oauthlib>=1.2.0
 google-analytics-admin>=0.22.0
 google-analytics-data>=0.18.0
