@@ -2,6 +2,8 @@
 
 This repository contains the static website for The Crooked House project at Homecoming Park.
 
+> 👀 **Looking for what's happening?** See **[PROJECT.md](PROJECT.md)** — the live status dashboard, what just shipped, what's next, and how the owner can get involved.
+
 ## About
 
 The Crooked House is a sculpture by Benjamin Fehl, preserving the façade of a historic house in Milesburg in concrete as a permanent art installation at Homecoming Park.
