@@ -137,6 +137,28 @@ def main():
     workspace = get_or_create_default_workspace(svc, container["path"])
     print(f"Workspace: {workspace['name']} ({workspace['path']})")
 
+    # Built-in variables (required before triggers can reference them)
+    print("\nBuilt-in variables:")
+    needed_builtins = [
+        "clickElement", "clickClasses", "clickId",
+        "clickTarget", "clickUrl", "clickText",
+    ]
+    existing_builtins = svc.accounts().containers().workspaces().built_in_variables().list(
+        parent=workspace["path"]
+    ).execute().get("builtInVariable", [])
+    existing_types = {v.get("type") for v in existing_builtins}
+    for t in needed_builtins:
+        if t in existing_types:
+            print(f"  {t}: already enabled, skipping")
+            continue
+        if args.dry_run:
+            print(f"  {t}: WOULD ENABLE")
+            continue
+        svc.accounts().containers().workspaces().built_in_variables().create(
+            parent=workspace["path"], type=t
+        ).execute()
+        print(f"  {t}: enabled")
+
     # Triggers
     print("\nTriggers:")
     all_pages_trigger_id = upsert_trigger(svc, workspace["path"], {
