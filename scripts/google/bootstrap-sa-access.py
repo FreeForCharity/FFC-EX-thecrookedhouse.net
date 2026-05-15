@@ -142,15 +142,15 @@ def grant_gtm(creds, sa_email: str, account_name: str, role: str) -> None:
 
 GA4_ROLE_MAP = {
     "admin": "predefinedRoles/admin",
-    "editor": "predefinedRoles/edit",
-    "viewer": "predefinedRoles/read",
+    "editor": "predefinedRoles/editor",
+    "viewer": "predefinedRoles/viewer",
 }
 
 
 def grant_ga4(creds, sa_email: str, measurement_id: str, role: str) -> None:
     print(f"\n--- GA4: grant {sa_email} as {role} on property w/ measurement {measurement_id} ---")
-    from google.analytics.admin import AnalyticsAdminServiceClient
-    from google.analytics.admin_v1beta.types import (
+    from google.analytics.admin_v1alpha import AnalyticsAdminServiceClient
+    from google.analytics.admin_v1alpha.types import (
         AccessBinding,
         CreateAccessBindingRequest,
     )
@@ -185,7 +185,7 @@ def grant_ga4(creds, sa_email: str, measurement_id: str, role: str) -> None:
                 return
             print(f"  updating roles: {list(b.roles)} -> [{target_role}]")
             b.roles[:] = [target_role]
-            from google.analytics.admin_v1beta.types import UpdateAccessBindingRequest
+            from google.analytics.admin_v1alpha.types import UpdateAccessBindingRequest
             client.update_access_binding(
                 request=UpdateAccessBindingRequest(access_binding=b)
             )

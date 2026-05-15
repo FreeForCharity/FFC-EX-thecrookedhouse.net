@@ -21,8 +21,8 @@ import argparse
 import os
 import sys
 
-from google.analytics.admin import AnalyticsAdminServiceClient
-from google.analytics.admin_v1beta.types import (
+from google.analytics.admin_v1alpha import AnalyticsAdminServiceClient
+from google.analytics.admin_v1alpha.types import (
     ConversionEvent,
     CustomDimension,
     DataRetentionSettings,
