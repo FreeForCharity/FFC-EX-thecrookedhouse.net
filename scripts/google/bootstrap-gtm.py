@@ -155,8 +155,6 @@ def main():
                  "value": r"(paypal\.com\/donate|zeffy\.com|donate\.thecrookedhouse\.net)"},
             ],
         }],
-        "waitForTags": [{"type": "boolean", "key": "boolean", "value": "true"}],
-        "checkValidation": [{"type": "boolean", "key": "boolean", "value": "false"}],
     }, args.dry_run)
 
     email_click_trigger_id = upsert_trigger(svc, workspace["path"], {
