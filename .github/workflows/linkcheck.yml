@@ -1,0 +1,28 @@
+name: Link check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly: Mondays at 12:00 UTC. Catches external links that rot over time.
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Config lives at ./lychee.toml; --base . means resolve relative
+          # links against the repo root (so href="/donors/" works in CI).
+          args: --config ./lychee.toml --base . './**/*.html'
+          fail: true
+          token: ${{ secrets.GITHUB_TOKEN }}

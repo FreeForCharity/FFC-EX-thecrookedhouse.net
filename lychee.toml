@@ -1,0 +1,30 @@
+## Lychee link-checker configuration
+## Docs: https://lychee.cli.rs/usage/config/
+
+## Retry transient failures (429 rate limits, network blips)
+max_retries = 3
+retry_wait_time = 5
+
+## Per-request timeout (seconds)
+timeout = 20
+
+## Look like a real browser. News sites and social networks often serve a
+## 403 to obvious bots even when the URL is fine for human visitors.
+user_agent = "Mozilla/5.0 (compatible; LinkChecker/1.0; +https://github.com/lycheeverse/lychee)"
+
+## Accept these status codes as success. 403/429/999 are commonly returned
+## by bot-protection layers (news outlets, LinkedIn, etc.) for URLs that
+## work fine in real browsers, so we don't fail CI on them.
+accept = [200, 204, 206, 301, 302, 304, 403, 429, 999]
+
+## Skip mailto:, tel:, javascript:, data: — not real network targets.
+exclude_mail = true
+exclude = [
+  '^data:',
+  '^javascript:',
+  '^tel:',
+]
+
+## Don't follow the same external URL more than once per run.
+cache = true
+max_cache_age = "1h"
