@@ -13,6 +13,7 @@ Thumbs.db
 *.tmp
 *.bak
 .cache/
+.lycheecache
 
 # Logs
 *.log
