@@ -18,7 +18,7 @@ user_agent = "Mozilla/5.0 (compatible; LinkChecker/1.0; +https://github.com/lych
 accept = [200, 204, 206, 301, 302, 304, 403, 429, 999]
 
 ## Skip mailto:, tel:, javascript:, data: — not real network targets.
-exclude_mail = true
+include_mail = false
 exclude = [
   '^data:',
   '^javascript:',
