@@ -281,7 +281,11 @@ jobs:
             page.setDefaultTimeout(45000);
             let resp = null;
             try {
-              resp = await page.goto(url, { waitUntil: 'networkidle' });
+              // 'load', not 'networkidle': pages with live payment/analytics
+              // widgets (Stripe, Google Pay, Amplitude) beacon continuously and
+              // never reach network silence (found on freedomrisingusa.org).
+              resp = await page.goto(url, { waitUntil: 'load' });
+              await page.waitForTimeout(1500); // let client-side UI (cookie banner) mount
             } catch (e) {
               console.error('navigation error:', e.message);
             }
