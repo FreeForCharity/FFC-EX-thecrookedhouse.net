@@ -55,7 +55,7 @@ jobs:
       GA4_STREAM_ID: ${{ vars.GA4_STREAM_ID }}
       GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - id: auth
         name: Authenticate to Google Cloud (Workload Identity Federation)
