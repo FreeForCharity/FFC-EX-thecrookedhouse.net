@@ -115,7 +115,7 @@ jobs:
 
       - name: Open PR if wire-site made changes
         if: ${{ (inputs.script == 'wire-site' || inputs.script == 'all') && !inputs.dry_run }}
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: chore/wire-gtm-snippet
