@@ -5,18 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge"><meta property=og:image content="https://thecrookedhouse.net/images/og-image.jpg"><meta property=og:image:width content="1200"><meta property=og:image:height content="630"><meta property=og:url content="https://thecrookedhouse.net/cookie-policy.html"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://thecrookedhouse.net/images/og-image.jpg">
   <meta http-equiv="content-security-policy" content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' data:; script-src 'self' 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"><!-- FFC Consent Mode v2 defaults. Every storage type that carries
-     measurement or personalisation is DENIED for every visitor,
-     worldwide: analytics_storage, ad_storage, ad_user_data,
-     ad_personalization and personalization_storage. The list is
-     written out rather than summarised as "analytics and advertising"
-     because a signal left unspecified defaults to GRANTED, and
-     personalization_storage is neither analytics nor advertising —
-     omitting it is what granted it here until now.
+     measurement or personalisation is DENIED by default:
+     analytics_storage, ad_storage, ad_user_data, ad_personalization and
+     personalization_storage. The list is written out rather than
+     summarised as "analytics and advertising" because a signal left
+     unspecified defaults to GRANTED, and personalization_storage is
+     neither analytics nor advertising: omitting it is what granted it
+     here until now.
      functionality_storage and security_storage stay granted by default:
      neither carries measurement, and the banner needs functionality
      storage to remember a choice. functionality_storage then follows
      the visitor's functional toggle through pushConsentUpdate() in
      cookie-consent.js, so it is granted BY DEFAULT rather than always.
+
+     Scope, stated exactly. This governs visitors whose browser runs
+     this script. A visitor with JavaScript disabled never executes it,
+     and the GTM noscript iframe below still loads for them, so the
+     denial does not reach that path. Saying "every visitor" would be
+     the same shape of over-claim that writing the signal list out is
+     meant to prevent.
+
      MUST execute before any Google tag, which is why it sits ahead of
      the GTM snippet below. -->
 <script>
