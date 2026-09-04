@@ -39,7 +39,10 @@ PAGES = [
 def gtm_head_snippet() -> str:
     """The official GTM <head> snippet with consent-mode v2 defaults applied
     BEFORE the container loads."""
-    return f"""<!-- Google Tag Manager (consent-mode v2 default applied first) -->
+    return f"""<!-- FFC Consent Mode v2 defaults. DENIED by default: analytics_storage,
+     ad_storage, ad_user_data, ad_personalization, personalization_storage.
+     Listed out rather than summarised: an unlisted signal defaults to
+     GRANTED. MUST run before any Google tag. -->
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){{dataLayer.push(arguments);}}

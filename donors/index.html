@@ -29,8 +29,8 @@
      The list is written out rather than summarised as "analytics and
      advertising" because an unlisted signal defaults to GRANTED, and
      personalization_storage is neither: omitting it is what granted it here
-     until now. functionality_storage and security_storage are granted; the
-     former follows the visitor's functional toggle via pushConsentUpdate().
+     until now. functionality_storage and security_storage stay granted:
+     nothing calls pushConsentUpdate(), so no consent update is ever sent.
      Governs visitors whose browser runs this script. With JavaScript off it
      never executes, and unlike the sibling legacy sites this page's CSP
      frame-src does not allowlist www.googletagmanager.com, so the noscript
