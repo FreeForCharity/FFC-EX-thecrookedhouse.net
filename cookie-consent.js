@@ -573,6 +573,7 @@ function pushConsentUpdate(consent) {
     'ad_storage': consent.marketing ? 'granted' : 'denied',
     'ad_user_data': consent.marketing ? 'granted' : 'denied',
     'ad_personalization': consent.marketing ? 'granted' : 'denied',
+    'personalization_storage': consent.marketing ? 'granted' : 'denied',
     'analytics_storage': consent.analytics ? 'granted' : 'denied',
     'functionality_storage': consent.functional ? 'granted' : 'denied',
     'security_storage': 'granted'

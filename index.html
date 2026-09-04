@@ -470,7 +470,21 @@
 }
 </style><style>.skip-link{position:absolute;top:-40px;left:0;padding:8px 16px;background:#000;color:#fff;font-size:14px;font-weight:600;text-decoration:none;z-index:10001;border-radius:0 0 4px 0}.skip-link:focus{top:0}</style>
 
-<meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' data:; script-src 'self' 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"><!-- Google Tag Manager (consent-mode v2 default applied first) -->
+<meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' data:; script-src 'self' 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"><!-- FFC Consent Mode v2 defaults. Every storage type that carries
+     measurement or personalisation is DENIED for every visitor,
+     worldwide: analytics_storage, ad_storage, ad_user_data,
+     ad_personalization and personalization_storage. The list is
+     written out rather than summarised as "analytics and advertising"
+     because a signal left unspecified defaults to GRANTED, and
+     personalization_storage is neither analytics nor advertising —
+     omitting it is what granted it here until now.
+     functionality_storage and security_storage stay granted by default:
+     neither carries measurement, and the banner needs functionality
+     storage to remember a choice. functionality_storage then follows
+     the visitor's functional toggle through pushConsentUpdate() in
+     cookie-consent.js, so it is granted BY DEFAULT rather than always.
+     MUST execute before any Google tag, which is why it sits ahead of
+     the GTM snippet below. -->
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -480,6 +494,7 @@ gtag('consent', 'default', {
   'ad_personalization': 'denied',
   'analytics_storage': 'denied',
   'functionality_storage': 'granted',
+  'personalization_storage': 'denied',
   'security_storage': 'granted',
   'wait_for_update': 500
 });
