@@ -18,11 +18,17 @@
      cookie-consent.js, so it is granted BY DEFAULT rather than always.
 
      Scope, stated exactly. This governs visitors whose browser runs
-     this script. A visitor with JavaScript disabled never executes it,
-     and the GTM noscript iframe below still loads for them, so the
-     denial does not reach that path. Saying "every visitor" would be
-     the same shape of over-claim that writing the signal list out is
-     meant to prevent.
+     this script; a visitor with JavaScript disabled never executes it.
+     On most FFC legacy sites the GTM noscript iframe below would still
+     load for such a visitor, leaving that path ungoverned -- but not
+     here. This page sends Content-Security-Policy with
+     frame-src 'self' data:, which does not allowlist
+     www.googletagmanager.com, so the iframe is blocked outright. The
+     JS-disabled path is therefore closed on this site for a reason that
+     has nothing to do with consent, and would reopen the moment that CSP
+     is widened. Do not copy this paragraph to a site without checking
+     its frame-src: the sibling legacy repos ship no CSP at all, where
+     the iframe does load and the opposite note applies.
 
      MUST execute before any Google tag, which is why it sits ahead of
      the GTM snippet below. -->
