@@ -24,7 +24,19 @@
     clear:both!important;
   }
 }
-</style><style>.skip-link{position:absolute;top:-40px;left:0;padding:8px 16px;background:#000;color:#fff;font-size:14px;font-weight:600;text-decoration:none;z-index:10001;border-radius:0 0 4px 0}.skip-link:focus{top:0}</style><meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' data:; script-src 'self' 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"><!-- Google Tag Manager (consent-mode v2 default applied first) -->
+</style><style>.skip-link{position:absolute;top:-40px;left:0;padding:8px 16px;background:#000;color:#fff;font-size:14px;font-weight:600;text-decoration:none;z-index:10001;border-radius:0 0 4px 0}.skip-link:focus{top:0}</style><meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; media-src 'self' data:; script-src 'self' 'unsafe-inline' data:; object-src 'self' data:; frame-src 'self' data:;"><!-- FFC Consent Mode v2 defaults. DENIED by default: analytics_storage,
+     ad_storage, ad_user_data, ad_personalization, personalization_storage.
+     The list is written out rather than summarised as "analytics and
+     advertising" because an unlisted signal defaults to GRANTED, and
+     personalization_storage is neither: omitting it is what granted it here
+     until now. functionality_storage and security_storage stay granted:
+     nothing calls pushConsentUpdate(), so no Consent Mode update reaches
+     Google's tags. The banner does push a dataLayer event named
+     consent_update; that is a container trigger, not consent. See #120.
+     Governs visitors whose browser runs this script. With JavaScript off it
+     never executes, and this page's CSP frame-src does not allowlist
+     www.googletagmanager.com, so the noscript iframe is blocked too.
+     MUST run before any Google tag. -->
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -34,6 +46,7 @@ gtag('consent', 'default', {
   'ad_personalization': 'denied',
   'analytics_storage': 'denied',
   'functionality_storage': 'granted',
+  'personalization_storage': 'denied',
   'security_storage': 'granted',
   'wait_for_update': 500
 });
